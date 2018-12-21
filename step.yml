@@ -1,10 +1,10 @@
 title: |-
-  Swiftlint
+  SwiftLint
 summary: |
-  Runs Swiftlint on the project
+  Runs SwiftLint on the project
 description: |
-  Runs Swiftlint on the project to provide clean code
-  For more information about Swiftlint please visit: https://github.com/realm/SwiftLint/
+  Runs SwiftLint on the project to provide clean code
+  For more information about SwiftLint please visit: https://github.com/realm/SwiftLint/
 website: https://github.com/kimdv/bitrise-step-swiftlint
 source_code_url: https://github.com/kimdv/bitrise-step-swiftlint
 support_url: https://github.com/kimdv/bitrise-step-swiftlint/issues
@@ -33,13 +33,21 @@ toolkit:
     entry_file: step.sh
 
 inputs:
-  - linting_path:
+
+  - executable_path: swiftlint
+    opts:
+      title: "SwiftLint executable"
+      summary: ""
+      description: "Command to call SwiftLint executable. It should be either system `swiftlint` call or `swiftlint` executable in project Pods folder."
+      is_required: true
+
+  - linting_path: $BITRISE_SOURCE_DIR
     opts:
       category: Config
-      title: "Select the path where Swiftlint should lint"
+      title: "Select the path where SwiftLint should be called"
       summary: ""
       description: ""
-      is_required: true
+      is_required: false
 
   - lint_config_file: $BITRISE_SOURCE_DIR/.swiftlint.yml
     opts:
@@ -64,6 +72,7 @@ inputs:
       - checkstyle
       - junit
       - emoji
+      - none
 
   - strict: "no"
     opts:

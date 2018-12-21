@@ -1,11 +1,8 @@
 #!/bin/bash
 set -ex
 
-if [ -z "${linting_path}" ] ; then
-  echo " [!] Missing required input: linting_path"
-
-  exit 1
-fi
+#
+# Flags 
 
 FLAGS=''
 
@@ -17,6 +14,30 @@ if [ -s "${lint_config_file}" ] ; then
   FLAGS=$FLAGS' --config '"${lint_config_file}"  
 fi
 
-cd "${linting_path}"
+if [ "${reporter}" != "none" ] ; then
+  FLAGS=$FLAGS' --reporter '"${reporter}"  
+fi
 
-swiftlint lint --reporter "${reporter}" ${FLAGS}
+#
+# Folder
+ 
+if [ -z "${linting_path}" ] ; then
+  linting_path="."
+fi
+
+
+#
+# Call
+
+pushd "${linting_path}"
+
+if [ -f "${executable_path}" ] ; then
+    $"executable_path" ${FLAGS}
+elif [ "${executable_path}" == "swiftlint" ]
+    swiftlint lint ${FLAGS}
+else
+  echo " [!] SwiftLint executable should be a path to file or a system swiftlint call. Received: '${executable_path}'"
+  exit 1
+fi
+
+popd
