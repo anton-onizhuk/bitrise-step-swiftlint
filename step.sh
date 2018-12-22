@@ -1,9 +1,6 @@
 #!/bin/bash
 
-set -ex
-
-#
-# Flags 
+set -x
 
 FLAGS=''
 
@@ -11,25 +8,29 @@ if [ "${strict}" = "yes" ] ; then
   FLAGS=$FLAGS' --strict'
 fi
 
-#
-# Folder
- 
-if [ -z "${linting_path}" ] ; then
-  linting_path="."
+if [ $override_reporter ] && [ "${override_reporter}" != "read_from_config" ] ; then
+  FLAGS=$FLAGS' --reporter'"$override_reporter"
 fi
 
-#
-# Call
+if [ -d "${working_directory}" ] ; then
+  cd "${working_directory}"
+fi
 
-pushd "${linting_path}"
-
-if [ -s "${executable_path}" ] ; then
-  "${executable_path}" --reporter "${reporter}" --config "${lint_config_file}" ${FLAGS}
-elif [ "${executable_path}" == "swiftlint" ] ; then
-  swiftlint lint --reporter "${reporter}" "${FLAGS}"
-else
-  echo " [!] SwiftLint executable should be a path to file or a system swiftlint call. Received: '$executable_path'"
+if [ ! -s "${executable_path}" ] ; then
+  echo " [!] SwiftLint executable does not exists at ${executable_path}"
   exit 1
 fi
 
-popd
+"${executable_path}" --strict ${FLAGS} --config "${lint_config_file}" > "swiftlint_errors.txt" 2> "swiftlint_log.txt"
+swiftlint_exit_code=$?
+
+cat "swiftlint_log.txt"
+cat "swiftlint_errors.txt"
+
+cat swiftlint_log.txt | tail -1 | envman add --key SWIFTLINT_RESULT_SUMMARY
+realpath swiftlint_errors.txt | envman add --key SWIFTLINT_VIOLATIONS_FILE
+
+echo "SWIFTLINT_RESULT_SUMMARY: $SWIFTLINT_RESULT_SUMMARY"
+echo "SWIFTLINT_VIOLATIONS_FILE: $SWIFTLINT_VIOLATIONS_FILE"
+
+exit $swiftlint_exit_code

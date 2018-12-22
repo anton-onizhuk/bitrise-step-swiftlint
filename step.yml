@@ -19,52 +19,44 @@ project_type_tags:
 type_tags:
   - utility
 
-is_requires_admin_user: true
+is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
 run_if: ""
-
-deps:
-  brew:
-  - name: swiftlint
 
 toolkit:
   bash:
     entry_file: step.sh
 
 inputs:
+  - working_directory: $BITRISE_SOURCE_DIR
+    opts:
+      title: "Working directory"
+      summary: ""
+      description: "Root directory from which SwiftLint will be called."
+      is_required: false
 
-  - executable_path: swiftlint
+  - executable_path: $BITRISE_SOURCE_DIR/Pods/swiftlint
     opts:
       title: "SwiftLint executable"
       summary: ""
       description: "Command to call SwiftLint executable. It should be either system `swiftlint` call or `swiftlint` executable in project Pods folder."
       is_required: true
 
-  - linting_path: $BITRISE_SOURCE_DIR
-    opts:
-      category: Config
-      title: "Select the path where SwiftLint should be called"
-      summary: ""
-      description: ""
-      is_required: false
-
   - lint_config_file: $BITRISE_SOURCE_DIR/.swiftlint.yml
     opts:
-      category: Config
       title: "Linting configuration file"
       summary: ""
       description: |-
-        If you use a custom linting configuration for Bitrise, you can specify the path here.
-      is_required: false
+        Path to `.swiftlint.yml` file.
+      is_required: true
 
-  - reporter: xcode
+  - override_reporter: read_from_config
     opts:
-      category: Config
+      title: Select method for export
+      summary: ""
       description: |-
         Sets the reporter style when printing violations or errors.
-      summary: ""
-      title: Select method for export
       value_options:
       - xcode
       - json
@@ -72,17 +64,26 @@ inputs:
       - checkstyle
       - junit
       - emoji
-      - none
+      - read_from_config
 
   - strict: "no"
     opts:
-      category: Config
+      title: Use strict mode
+      summary: ""
       description: |-
         Use strict mode when linting (i.e. warnings become errors)
-      is_required: false
-      summary: ""
-      title: Use strict mode
       value_options:
       - "yes"
       - "no"
 outputs:
+  - SWIFTLINT_RESULT_SUMMARY:
+    opts:
+      title: Summary of SwiftLint scan. 
+      description: |-
+        It's the last line of SwiftLint output before the list of violations. 
+        `Done linting! Found 1 violation, 0 serious in 242 files.`
+  - SWIFTLINT_VIOLATIONS_FILE:
+    opts:
+      title: Violations file
+      description: |
+        Path to a file that contains all found violations. It's whole SwiftLint output to `stdout`.
