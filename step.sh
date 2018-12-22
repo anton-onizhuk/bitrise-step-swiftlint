@@ -31,7 +31,7 @@ log_last_line=$(cat swiftlint_log.txt | tail -1 )
 SWIFTLINT_RESULT_SUMMARY=${log_last_line#Done linting! }
 SWIFTLINT_VIOLATIONS_FILE=$(realpath swiftlint_errors.txt)
 
-if [ swiftlint_exit_code = 0 ] ; then
+if [ $swiftlint_exit_code = 0 ] ; then
     SWIFTLINT_SCAN_STATUS="success"
 else
     SWIFTLINT_SCAN_STATUS="failure"
