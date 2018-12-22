@@ -2,7 +2,6 @@
 
 set -x
 
-
 FLAGS=''
 
 if [ "${strict}" = "yes" ] ; then
@@ -31,12 +30,22 @@ cat "swiftlint_errors.txt"
 SWIFTLINT_RESULT_SUMMARY=$(cat swiftlint_log.txt | tail -1 )
 SWIFTLINT_VIOLATIONS_FILE=$(realpath swiftlint_errors.txt)
 
+if [ swiftlint_exit_code = 0 ] ; then
+    SWIFTLINT_SCAN_STATUS="success"
+else
+    SWIFTLINT_SCAN_STATUS="failure"
+fi
+
+
 envman add --key SWIFTLINT_RESULT_SUMMARY --value "$SWIFTLINT_RESULT_SUMMARY"
 envman add --key SWIFTLINT_VIOLATIONS_FILE --value "$SWIFTLINT_VIOLATIONS_FILE"
+envman add --key SWIFTLINT_SCAN_STATUS --value "$SWIFTLINT_SCAN_STATUS"
 
 echo SWIFTLINT_RESULT_SUMMARY
 echo "$SWIFTLINT_RESULT_SUMMARY"
 echo SWIFTLINT_VIOLATIONS_FILE
 echo "$SWIFTLINT_VIOLATIONS_FILE"
+echo SWIFTLINT_SCAN_STATUS
+echo "$SWIFTLINT_SCAN_STATUS"
 
 exit $swiftlint_exit_code

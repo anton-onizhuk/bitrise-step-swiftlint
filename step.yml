@@ -87,3 +87,8 @@ outputs:
       title: Violations file
       description: |
         Path to a file that contains all found violations. It's whole SwiftLint output to `stdout`.
+  - SWIFTLINT_SCAN_STATUS:
+    opts:
+      title: Scan Status
+      description: |
+        Either `success` or `failure` depending on SwiftLint exit code.
