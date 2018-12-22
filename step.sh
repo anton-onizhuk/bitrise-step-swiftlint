@@ -27,7 +27,8 @@ swiftlint_exit_code=$?
 cat "swiftlint_log.txt"
 cat "swiftlint_errors.txt"
 
-SWIFTLINT_RESULT_SUMMARY=$(cat swiftlint_log.txt | tail -1 )
+log_last_line=$(cat swiftlint_log.txt | tail -1 )
+SWIFTLINT_RESULT_SUMMARY=${log_last_line#Done linting! }
 SWIFTLINT_VIOLATIONS_FILE=$(realpath swiftlint_errors.txt)
 
 if [ swiftlint_exit_code = 0 ] ; then
