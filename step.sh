@@ -2,6 +2,7 @@
 
 set -x
 
+
 FLAGS=''
 
 if [ "${strict}" = "yes" ] ; then
@@ -27,10 +28,15 @@ swiftlint_exit_code=$?
 cat "swiftlint_log.txt"
 cat "swiftlint_errors.txt"
 
-cat swiftlint_log.txt | tail -1 | envman add --key SWIFTLINT_RESULT_SUMMARY
-realpath swiftlint_errors.txt | envman add --key SWIFTLINT_VIOLATIONS_FILE
+SWIFTLINT_RESULT_SUMMARY=$(cat swiftlint_log.txt | tail -1 )
+SWIFTLINT_VIOLATIONS_FILE=$(realpath swiftlint_errors.txt)
 
-echo "SWIFTLINT_RESULT_SUMMARY: $SWIFTLINT_RESULT_SUMMARY"
-echo "SWIFTLINT_VIOLATIONS_FILE: $SWIFTLINT_VIOLATIONS_FILE"
+envman add --key SWIFTLINT_RESULT_SUMMARY --value $SWIFTLINT_RESULT_SUMMARY
+envman add --key SWIFTLINT_VIOLATIONS_FILE --value $SWIFTLINT_VIOLATIONS_FILE
+
+echo SWIFTLINT_RESULT_SUMMARY
+echo "$SWIFTLINT_RESULT_SUMMARY"
+echo SWIFTLINT_VIOLATIONS_FILE
+echo "$SWIFTLINT_VIOLATIONS_FILE"
 
 exit $swiftlint_exit_code
