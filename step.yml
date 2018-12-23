@@ -1,13 +1,13 @@
 title: |-
-  SwiftLint
+  SwiftLint Pod
 summary: |
-  Runs SwiftLint on the project
+  Runs SwiftLint from the project Pods
 description: |
   Runs SwiftLint on the project to provide clean code
   For more information about SwiftLint please visit: https://github.com/realm/SwiftLint/
-website: https://github.com/kimdv/bitrise-step-swiftlint
-source_code_url: https://github.com/kimdv/bitrise-step-swiftlint
-support_url: https://github.com/kimdv/bitrise-step-swiftlint/issues
+website: https://github.com/anton-onizhuk/bitrise-step-swiftlint
+source_code_url: https://github.com/anton-onizhuk/bitrise-step-swiftlint
+support_url: https://github.com/anton-onizhuk/bitrise-step-swiftlint/issues
 host_os_tags:
   - osx-10.10
   - ubuntu-16.04
@@ -17,7 +17,7 @@ project_type_tags:
   - macos
 
 type_tags:
-  - utility
+  - test
 
 is_requires_admin_user: false
 is_always_run: false
