@@ -9,7 +9,7 @@ if [ "${strict}" = "yes" ] ; then
 fi
 
 if [ $reporter ] ; then
-  FLAGS=$FLAGS' --reporter'"$reporter"
+  FLAGS=$FLAGS' --reporter '"$reporter"
 fi
 
 if [ -d "${working_directory}" ] ; then
@@ -24,13 +24,13 @@ if [ ! -s "${executable_path}" ] ; then
 fi
 
 if [ -d "${logs_directory}" ] ; then
-    log_file = "${logs_directory}/swiftlint_log.txt"
-    errors_file = "${logs_directory}/swiftlint_errors"
+    log_file="${logs_directory}/swiftlint_log.txt"
+    errors_file="${logs_directory}/swiftlint_errors"
     clear_cache="false"
 else
     echo " (?) Logs directory not found. Storing no logs."
-    log_file = "swiftlint_log.txt"
-    errors_file = "swiftlint_errors"
+    log_file="swiftlint_log.txt"
+    errors_file="swiftlint_errors"
     clear_cache="true"
 fi
 
