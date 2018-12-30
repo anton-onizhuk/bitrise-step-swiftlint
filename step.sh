@@ -8,12 +8,14 @@ if [ "${strict}" = "yes" ] ; then
   FLAGS=$FLAGS' --strict'
 fi
 
-if [ $override_reporter ] && [ "${override_reporter}" != "read_from_config" ] ; then
-  FLAGS=$FLAGS' --reporter'"$override_reporter"
+if [ $reporter ] ; then
+  FLAGS=$FLAGS' --reporter'"$reporter"
 fi
 
 if [ -d "${working_directory}" ] ; then
-  cd "${working_directory}"
+  pushd "${working_directory}"
+else
+  pushd "."
 fi
 
 if [ ! -s "${executable_path}" ] ; then
@@ -21,15 +23,43 @@ if [ ! -s "${executable_path}" ] ; then
   exit 1
 fi
 
-"${executable_path}" --strict ${FLAGS} --config "${lint_config_file}" > "swiftlint_errors.txt" 2> "swiftlint_log.txt"
+if [ -d "${logs_directory}" ] ; then
+    log_file = "${logs_directory}/swiftlint_log.txt"
+    errors_file = "${logs_directory}/swiftlint_errors"
+    clear_cache="false"
+else
+    echo " (?) Logs directory not found. Storing no logs."
+    log_file = "swiftlint_log.txt"
+    errors_file = "swiftlint_errors"
+    clear_cache="true"
+fi
+
+case $reporter in
+    json|csv|html)
+        errors_file="${errors_file}.${reporter}"
+        ;;
+    xcode|emoji)
+        errors_file="${errors_file}.txt"
+        ;;
+    checkstyle|junit)
+        errors_file="${errors_file}.xml"
+        ;; 
+    sonarqube)
+        errors_file="${errors_file}.json"
+        ;; 
+    markdown)
+        errors_file="${errors_file}.md"
+        ;; 
+esac
+
+"${executable_path}" --strict ${FLAGS} --config "${lint_config_file}" > "${errors_file}" 2> "${log_file}"
 swiftlint_exit_code=$?
 
-cat "swiftlint_log.txt"
-cat "swiftlint_errors.txt"
+cat "${log_file}"
+cat "${errors_file}"
 
-log_last_line=$(cat swiftlint_log.txt | tail -1 )
+log_last_line=$(cat "${log_file}" | tail -1 )
 SWIFTLINT_RESULT_SUMMARY=${log_last_line#Done linting! }
-SWIFTLINT_VIOLATIONS_FILE=$(realpath swiftlint_errors.txt)
 
 if [ $swiftlint_exit_code = 0 ] ; then
     SWIFTLINT_SCAN_STATUS="success"
@@ -37,16 +67,24 @@ else
     SWIFTLINT_SCAN_STATUS="failure"
 fi
 
-
 envman add --key SWIFTLINT_RESULT_SUMMARY --value "$SWIFTLINT_RESULT_SUMMARY"
 envman add --key SWIFTLINT_VIOLATIONS_FILE --value "$SWIFTLINT_VIOLATIONS_FILE"
-envman add --key SWIFTLINT_SCAN_STATUS --value "$SWIFTLINT_SCAN_STATUS"
 
-echo SWIFTLINT_RESULT_SUMMARY
-echo "$SWIFTLINT_RESULT_SUMMARY"
-echo SWIFTLINT_VIOLATIONS_FILE
-echo "$SWIFTLINT_VIOLATIONS_FILE"
-echo SWIFTLINT_SCAN_STATUS
-echo "$SWIFTLINT_SCAN_STATUS"
+if [ "${clear_cache}" == "true" ] ; then
+    rm -f "${log_file}"
+    rm -f "${errors_file}"
+else
+    SWIFTLINT_VIOLATIONS_FILE=$(realpath "${errors_file}")
+    SWIFTLINT_LOGS_FILE=$(realpath "${log_file}")
+    envman add --key SWIFTLINT_SCAN_STATUS --value "$SWIFTLINT_SCAN_STATUS"
+    envman add --key SWIFTLINT_LOGS_FILE --value "$SWIFTLINT_LOGS_FILE"
+fi
+
+echo "SWIFTLINT_RESULT_SUMMARY: $SWIFTLINT_RESULT_SUMMARY"
+echo "SWIFTLINT_VIOLATIONS_FILE: $SWIFTLINT_VIOLATIONS_FILE"
+echo "SWIFTLINT_SCAN_STATUS: $SWIFTLINT_SCAN_STATUS"
+echo "SWIFTLINT_LOGS_FILE: $SWIFTLINT_LOGS_FILE"
+
+popd 
 
 exit $swiftlint_exit_code

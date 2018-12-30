@@ -29,11 +29,12 @@ toolkit:
     entry_file: step.sh
 
 inputs:
+
   - working_directory: $BITRISE_SOURCE_DIR
     opts:
       title: "Working directory"
       summary: ""
-      description: "Root directory from which SwiftLint will be called."
+      description: "Directory from which SwiftLint will be called."
       is_required: false
 
   - executable_path: $BITRISE_SOURCE_DIR/Pods/swiftlint
@@ -51,7 +52,7 @@ inputs:
         Path to `.swiftlint.yml` file.
       is_required: true
 
-  - override_reporter: read_from_config
+  - reporter: xcode
     opts:
       title: Select method for export
       summary: ""
@@ -63,8 +64,10 @@ inputs:
       - csv
       - checkstyle
       - junit
+      - html
       - emoji
-      - read_from_config
+      - sonarqube
+      - markdown
 
   - strict: "no"
     opts:
@@ -75,6 +78,14 @@ inputs:
       value_options:
       - "yes"
       - "no"
+
+  - logs_directory: $BITRISE_DEPLOY_DIR
+    opts:
+      title: "Log directory"
+      summary: ""
+      description: "Directory to store SwiftLint logs."
+      is_required: false
+
 outputs:
   - SWIFTLINT_RESULT_SUMMARY:
     opts:
@@ -82,11 +93,16 @@ outputs:
       description: |-
         It's the last line of SwiftLint output before the list of violations. 
         `Done linting! Found 1 violation, 0 serious in 242 files.`
+  - SWIFTLINT_LOGS_FILE:
+    opts:
+      title: Logs file
+      description: |
+        Path to a file that contains SwiftLint status logs (like 'Linting <file>' & 'Done linting'). It's the whole SwiftLint output to `stderr`.
   - SWIFTLINT_VIOLATIONS_FILE:
     opts:
       title: Violations file
       description: |
-        Path to a file that contains all found violations. It's whole SwiftLint output to `stdout`.
+        Path to a file that contains all found violations. It's the whole SwiftLint output to `stdout`.
   - SWIFTLINT_SCAN_STATUS:
     opts:
       title: Scan Status
