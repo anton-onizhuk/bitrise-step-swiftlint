@@ -56,6 +56,8 @@ esac
 swiftlint_exit_code=$?
 
 cat "${log_file}"
+echo
+echo " (?) SwiftLint report:"
 cat "${errors_file}"
 
 log_last_line=$(cat "${log_file}" | tail -1 )
@@ -68,7 +70,7 @@ else
 fi
 
 envman add --key SWIFTLINT_RESULT_SUMMARY --value "$SWIFTLINT_RESULT_SUMMARY"
-envman add --key SWIFTLINT_VIOLATIONS_FILE --value "$SWIFTLINT_VIOLATIONS_FILE"
+envman add --key SWIFTLINT_SCAN_STATUS --value "$SWIFTLINT_SCAN_STATUS"
 
 if [ "${clear_cache}" == "true" ] ; then
     rm -f "${log_file}"
@@ -76,7 +78,7 @@ if [ "${clear_cache}" == "true" ] ; then
 else
     SWIFTLINT_VIOLATIONS_FILE=$(realpath "${errors_file}")
     SWIFTLINT_LOGS_FILE=$(realpath "${log_file}")
-    envman add --key SWIFTLINT_SCAN_STATUS --value "$SWIFTLINT_SCAN_STATUS"
+    envman add --key SWIFTLINT_VIOLATIONS_FILE --value "$SWIFTLINT_VIOLATIONS_FILE"
     envman add --key SWIFTLINT_LOGS_FILE --value "$SWIFTLINT_LOGS_FILE"
 fi
 
